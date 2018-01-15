@@ -1,5 +1,5 @@
-
 //Import Libraries  
+
 import de.voidplus.leapmotion.*;
 import oscP5.*;
 import netP5.*;
@@ -23,6 +23,8 @@ String tagType = "";
 float val = 0;
 ScreenTapGesture g;
 
+      int button =0;
+      int prev_button = 0;
 
 
 void setup() {
@@ -97,12 +99,12 @@ void draw() {
 
     //Testing finger as a 
     
-    fingers();
+    customGesture();
     
   }
 
 
-void fingers(){
+void customGesture(){
   
     strokeWeight(2);
     
@@ -138,21 +140,23 @@ void fingers(){
     // ==================================================
     // 1. Hand
 
-    int     handId             = hand.getId();
-    PVector handPosition       = hand.getPosition();
-    PVector handStabilized     = hand.getStabilizedPosition();
-    PVector handDirection      = hand.getDirection();
-    PVector handDynamics       = hand.getDynamics();
-    float   handRoll           = hand.getRoll();
-    float   handPitch          = hand.getPitch();
-    float   handYaw            = hand.getYaw();
+//    int     handId             = hand.getId();
+//    PVector handPosition       = hand.getPosition();
+//    PVector handStabilized     = hand.getStabilizedPosition();
+//    PVector handDirection      = hand.getDirection();
+//    PVector handDynamics       = hand.getDynamics();
+//    float   handRoll           = hand.getRoll();
+//    float   handPitch          = hand.getPitch();
+//    float   handYaw            = hand.getYaw();
     boolean handIsLeft         = hand.isLeft();
     boolean handIsRight        = hand.isRight();
     float   handGrab           = hand.getGrabStrength();
     float   handPinch          = hand.getPinchStrength();
     float   handTime           = hand.getTimeVisible();
-    PVector spherePosition     = hand.getSpherePosition();
-    float   sphereRadius       = hand.getSphereRadius();
+    PVector handOrigin =  hand.getPalmPosition();
+ 
+//    PVector spherePosition     = hand.getSpherePosition();
+//    float   sphereRadius       = hand.getSphereRadius();
 
     
     //===================================================
@@ -162,21 +166,36 @@ void fingers(){
 
       int     fingerId         = finger.getId();
       PVector fingerPosition   = finger.getPosition();
-      PVector fingerStabilized = finger.getStabilizedPosition();
-      PVector fingerVelocity   = finger.getVelocity();
-      PVector fingerDirection  = finger.getDirection();
+//      PVector fingerStabilized = finger.getStabilizedPosition();
+//      PVector fingerVelocity   = finger.getVelocity();
+//      PVector fingerDirection  = finger.getDirection();
       float   fingerTime       = finger.getTimeVisible();
-          
+      
 
       int state=1;
-
-
+   
+      
+      // update button
+      prev_button = button;
       if(fingerPosition.x < r1displayWidth && r1displayHeight>fingerPosition.y && hand.getGrabStrength ()>0.60)  {
-       
-leapOnScreenTapGesture(ScreenTapGesture g);
+           button = 1; // top left
+       }
+      else if(fingerPosition.x < r2displayWidth && touchAreaR2>fingerPosition.y && hand.getGrabStrength ()>0.60) {
+            button = 2;
+      }     
+      else if(fingerPosition.x < r3displayWidth && touchAreaR3 >fingerPosition.y && hand.getGrabStrength ()>0.60) {
+        button = 3;
+      }
+      else if(fingerPosition.x < r4displayWidth && hand.getGrabStrength ()>0.60) {
+        button = 4;
+      }
+      
+      if(button==1 && prev_button != button )  {
+        
         println("Note 1 selected");
         
         rect(fingerPosition.x, fingerPosition.y, 10, 10);
+       }        
         
         switch(state){
           
@@ -199,19 +218,19 @@ leapOnScreenTapGesture(ScreenTapGesture g);
         }
         
         }
-        else if(fingerPosition.x < r2displayWidth && touchAreaR2>fingerPosition.y && hand.getGrabStrength ()>0.60){
+        else if(button==2 && prev_button != button){
          rect(fingerPosition.x, fingerPosition.y, 30, 30);
          
          println("Note 2 selected");
         
         }
-      else if(fingerPosition.x < r3displayWidth && touchAreaR3 >fingerPosition.y && hand.getGrabStrength ()>0.60){
+      else if(button==3 && prev_button != button){
          rect(fingerPosition.x, fingerPosition.y, 10, 10);
          
          println("Note 3 selected");
         
         }
-        else if(fingerPosition.x < r4displayWidth && hand.getGrabStrength ()>0.60 ){
+        else if(button==4 && prev_button != button ){
         //   background(50,255,255);
         
             println("Note 4 selected");
@@ -227,16 +246,6 @@ leapOnScreenTapGesture(ScreenTapGesture g);
    }
 }
 
-void leapOnScreenTapGesture(ScreenTapGesture g){
-  int     id               = g.getId();
-  Finger  finger           = g.getFinger();
-  PVector position         = g.getPosition();
-  PVector direction        = g.getDirection();
-  long    duration         = g.getDuration();
-  float   durationSeconds  = g.getDurationInSeconds();
-
-  println("ScreenTapGesture: " + id);
-}
 
 void oscEvent(OscMessage theOscMessage){
   
@@ -245,4 +254,3 @@ void oscEvent(OscMessage theOscMessage){
   val = theOscMessage.get(0).floatValue();
 
 }
-
